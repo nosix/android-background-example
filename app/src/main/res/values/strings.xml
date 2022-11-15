@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">background-example</string>
+    <string name="text_cancel">Cancel</string>
 </resources>
