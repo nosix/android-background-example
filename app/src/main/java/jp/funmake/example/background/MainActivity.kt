@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
+import android.widget.Button
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.work.*
@@ -20,6 +21,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         log.d("MainActivity::onCreate")
+        findViewById<Button>(R.id.cancel).setOnClickListener {
+            cancel()
+        }
         startBackgroundTasks()
     }
 
@@ -76,22 +80,22 @@ class MainActivity : AppCompatActivity() {
 
         WorkManager.getInstance(this).run {
             enqueueUniqueWork(
-                "oneTimeBackground",
+                WORK_NAME_ONE_TIME_BACKGROUND,
                 ExistingWorkPolicy.REPLACE,
                 oneTimeWorkRequest
             )
             enqueueUniquePeriodicWork(
-                "periodicBackground",
+                WORK_NAME_PERIODIC_BACKGROUND,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 periodicWorkRequest
             )
             enqueueUniqueWork(
-                "oneTimeForeground",
+                WORK_NAME_ONE_TIME_FOREGROUND,
                 ExistingWorkPolicy.REPLACE,
                 foregroundOneTimeWorkRequest
             )
             enqueueUniquePeriodicWork(
-                "periodicForeground",
+                WORK_NAME_PERIODIC_FOREGROUND,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 foregroundPeriodicWorkRequest
             )
@@ -109,16 +113,7 @@ class MainActivity : AppCompatActivity() {
 
         startService(backgroundService)
         ActivityCompat.startForegroundService(this, foregroundService)
-        bindService(boundService, object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-                log.d("onServiceConnected: $name")
-                (binder as? BoundService.Binder)?.execute()
-            }
-
-            override fun onServiceDisconnected(name: ComponentName) {
-                log.d("onServiceDisconnected: $name")
-            }
-        }, Service.BIND_AUTO_CREATE)
+        bindService(boundService, serviceConnection, Service.BIND_AUTO_CREATE)
     }
 
     private fun startAlarms() {
@@ -136,5 +131,56 @@ class MainActivity : AppCompatActivity() {
             SystemClock.elapsedRealtime() + 1000 * 60,
             alarmAction
         )
+        this.alarmAction = alarmAction
+    }
+
+    private fun cancel() {
+        log.d("MainActivity::cancel")
+        cancelWorkers()
+        cancelServices()
+        cancelAlarms()
+    }
+
+    private fun cancelWorkers() {
+        WorkManager.getInstance(this).run {
+            cancelUniqueWork(WORK_NAME_ONE_TIME_BACKGROUND)
+            cancelUniqueWork(WORK_NAME_PERIODIC_BACKGROUND)
+            cancelUniqueWork(WORK_NAME_ONE_TIME_FOREGROUND)
+            cancelUniqueWork(WORK_NAME_PERIODIC_FOREGROUND)
+        }
+    }
+
+    private fun cancelServices() {
+        stopService(Intent(this, LogService::class.java))
+        stopService(Intent(this, ForegroundService::class.java))
+        unbindService(serviceConnection)
+    }
+
+    private fun cancelAlarms() {
+        val alarmManager = checkNotNull(getSystemService<AlarmManager>())
+        alarmAction?.let { action ->
+            alarmManager.cancel(action)
+            alarmAction = null
+        }
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+            log.d("onServiceConnected: $name")
+            (binder as? BoundService.Binder)?.execute()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            log.d("onServiceDisconnected: $name")
+        }
+    }
+
+    private var alarmAction: PendingIntent? = null
+
+    companion object {
+        private const val WORK_NAME_ONE_TIME_BACKGROUND = "oneTimeBackground"
+        private const val WORK_NAME_PERIODIC_BACKGROUND = "periodicBackground"
+        private const val WORK_NAME_ONE_TIME_FOREGROUND = "oneTimeForeground"
+        private const val WORK_NAME_PERIODIC_FOREGROUND = "periodicForeground"
     }
 }
