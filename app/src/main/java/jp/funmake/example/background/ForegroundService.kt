@@ -7,6 +7,7 @@ import android.os.IBinder
 import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class ForegroundService : Service() {
@@ -19,6 +20,7 @@ class ForegroundService : Service() {
 
     override fun onDestroy() {
         log.d("ForegroundService::onDestroy")
+        coroutineScope.cancel()
     }
 
     override fun onBind(intent: Intent): IBinder {
