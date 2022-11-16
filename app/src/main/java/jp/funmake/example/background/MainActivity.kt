@@ -70,12 +70,18 @@ class MainActivity : AppCompatActivity() {
                 .build()
         val foregroundOneTimeWorkRequest = OneTimeWorkRequestBuilder<ForegroundWorker>()
             .setInitialDelay(1, TimeUnit.MINUTES)
-            .setInputData(workDataOf(ForegroundWorker.PARAM_MESSAGE to "foregroundOneTime"))
+            .setInputData(workDataOf(
+                ForegroundWorker.PARAM_NOTIFICATION_ID to 11,
+                ForegroundWorker.PARAM_MESSAGE to "foregroundOneTime"
+            ))
             .build()
         val foregroundPeriodicWorkRequest =
             PeriodicWorkRequestBuilder<ForegroundWorker>(15, TimeUnit.MINUTES, 15, TimeUnit.MINUTES)
                 .setInitialDelay(1, TimeUnit.MINUTES)
-                .setInputData(workDataOf(ForegroundWorker.PARAM_MESSAGE to "foregroundPeriodic"))
+                .setInputData(workDataOf(
+                    ForegroundWorker.PARAM_NOTIFICATION_ID to 12,
+                    ForegroundWorker.PARAM_MESSAGE to "foregroundPeriodic"
+                ))
                 .build()
 
         WorkManager.getInstance(this).run {
