@@ -3,6 +3,9 @@ package jp.funmake.example.background
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BoundService : Service() {
     override fun onCreate() {
@@ -18,8 +21,15 @@ class BoundService : Service() {
     }
 
     inner class Binder : android.os.Binder() {
+
+        private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
         fun execute() {
-            log.d("BoundService::execute")
+            coroutineScope.launch {
+                longAction(20) {
+                    log.d("$it BoundService::execute")
+                }
+            }
         }
     }
 }

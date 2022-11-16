@@ -3,8 +3,14 @@ package jp.funmake.example.background
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LogService : Service() {
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     override fun onCreate() {
         log.d("LogService::onCreate")
     }
@@ -25,7 +31,12 @@ class LogService : Service() {
         } else {
             val returnValue = intent?.getIntExtra(PARAM_RETURN_VALUE, START_STICKY_COMPATIBILITY)
                 ?: START_STICKY_COMPATIBILITY
-            log.d("LogService::onStartCommand($flags, $startId) -> $returnValue")
+            coroutineScope.launch {
+                longAction(20) {
+                    log.d("$it LogService::onStartCommand($flags, $startId) -> $returnValue")
+                }
+                stopSelf()
+            }
             returnValue
         }
     }

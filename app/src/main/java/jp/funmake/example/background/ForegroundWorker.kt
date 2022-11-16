@@ -10,7 +10,9 @@ class ForegroundWorker(appContext: Context, params: WorkerParameters) :
         val notificationId = inputData.getInt(PARAM_NOTIFICATION_ID, 10)
         setForeground(createForegroundInfo(notificationId))
         val message = inputData.getString(PARAM_MESSAGE) ?: Result.failure()
-        log.d("ForegroundWorker::doWork: $message")
+        longAction(20) {
+            log.d("$it ForegroundWorker::doWork: $message")
+        }
         return Result.success(workDataOf(PARAM_MESSAGE to message))
     }
 

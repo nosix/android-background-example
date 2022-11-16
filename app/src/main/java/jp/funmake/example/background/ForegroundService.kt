@@ -5,8 +5,14 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ForegroundService : Service() {
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     override fun onCreate() {
         log.d("ForegroundService::onCreate")
     }
@@ -40,7 +46,12 @@ class ForegroundService : Service() {
         } else {
             val returnValue = intent?.getIntExtra(PARAM_RETURN_VALUE, START_STICKY_COMPATIBILITY)
                 ?: START_STICKY_COMPATIBILITY
-            log.d("ForegroundService::onStartCommand($flags, $startId) -> $returnValue")
+            coroutineScope.launch {
+                longAction(20) {
+                    log.d("$it ForegroundService::onStartCommand($flags, $startId) -> $returnValue")
+                }
+                stopSelf()
+            }
             returnValue
         }
     }

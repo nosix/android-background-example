@@ -10,7 +10,9 @@ class LogWorker(appContext: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val message = inputData.getString(PARAM_MESSAGE) ?: Result.failure()
-        log.d("LogWorker::doWork: $message")
+        longAction(20) {
+            log.d("$it LogWorker::doWork: $message")
+        }
         return Result.success(workDataOf(PARAM_MESSAGE to message))
     }
 
