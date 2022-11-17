@@ -33,7 +33,7 @@ fun Context.createNotification(text: String, cancelAction: PendingIntent? = null
     return NotificationCompat.Builder(applicationContext, channelId)
         .setContentTitle("background-example")
         .setContentText(text)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setSmallIcon(R.drawable.ic_notification)
         .apply {
             cancelAction?.let {
                 addAction(android.R.drawable.ic_delete, "cancel", it)
