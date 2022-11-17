@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class AlarmService : Service() {
@@ -17,6 +18,7 @@ class AlarmService : Service() {
 
     override fun onDestroy() {
         log.d("AlarmService::onDestroy")
+        coroutineScope.cancel()
     }
 
     override fun onBind(intent: Intent): IBinder {

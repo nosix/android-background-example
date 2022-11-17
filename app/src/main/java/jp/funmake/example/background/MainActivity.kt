@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                 this,
                 0,
                 it,
-                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
         val alarmManager = checkNotNull(getSystemService<AlarmManager>())
