@@ -21,10 +21,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         log.d("MainActivity::onCreate")
+        findViewById<Button>(R.id.start).setOnClickListener {
+            startBackgroundTasks()
+        }
         findViewById<Button>(R.id.cancel).setOnClickListener {
             cancel()
         }
-        startBackgroundTasks()
     }
 
     override fun onStart() {
