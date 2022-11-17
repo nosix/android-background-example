@@ -28,14 +28,12 @@ fun Context.createNotificationChannel(): String {
     return channelId
 }
 
-fun Context.createNotification(cancelAction: PendingIntent? = null): Notification {
+fun Context.createNotification(text: String, cancelAction: PendingIntent? = null): Notification {
     val channelId = applicationContext.createNotificationChannel()
     return NotificationCompat.Builder(applicationContext, channelId)
         .setContentTitle("background-example")
-//        .setTicker("ticker")
-        .setContentText("Example")
+        .setContentText(text)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
-//        .setOngoing(true)
         .apply {
             cancelAction?.let {
                 addAction(android.R.drawable.ic_delete, "cancel", it)

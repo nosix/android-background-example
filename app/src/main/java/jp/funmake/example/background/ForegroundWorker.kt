@@ -8,17 +8,17 @@ class ForegroundWorker(appContext: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val notificationId = inputData.getInt(PARAM_NOTIFICATION_ID, 10)
-        setForeground(createForegroundInfo(notificationId))
-        val message = inputData.getString(PARAM_MESSAGE) ?: Result.failure()
+        val message = inputData.getString(PARAM_MESSAGE) ?: return Result.failure()
+        setForeground(createForegroundInfo(notificationId, message))
         longAction(20) {
             log.d("$it ForegroundWorker::doWork: $message")
         }
         return Result.success(workDataOf(PARAM_MESSAGE to message))
     }
 
-    private fun createForegroundInfo(notificationId: Int): ForegroundInfo {
+    private fun createForegroundInfo(notificationId: Int, text: String): ForegroundInfo {
         val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
-        return ForegroundInfo(notificationId, applicationContext.createNotification(intent))
+        return ForegroundInfo(notificationId, applicationContext.createNotification(text, intent))
     }
 
     companion object {

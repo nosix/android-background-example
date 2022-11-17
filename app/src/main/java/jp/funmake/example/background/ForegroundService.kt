@@ -38,7 +38,7 @@ class ForegroundService : Service() {
             cancelIntent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
-        startForeground(channelId, createNotification(pendingIntent))
+        startForeground(channelId, createNotification("ForegroundService", pendingIntent))
 
         return if (intent?.getBooleanExtra(PARAM_CANCEL, false) == true) {
             log.d("ForegroundServer::cancel")

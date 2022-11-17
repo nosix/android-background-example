@@ -9,7 +9,7 @@ class LogWorker(appContext: Context, params: WorkerParameters) :
     CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val message = inputData.getString(PARAM_MESSAGE) ?: Result.failure()
+        val message = inputData.getString(PARAM_MESSAGE) ?: return Result.failure()
         longAction(20) {
             log.d("$it LogWorker::doWork: $message")
         }
